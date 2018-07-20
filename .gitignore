@@ -28,7 +28,7 @@ proguard/
 .navigation/
 
 # Android Studio captures folder
-captures/
+pictures/
 
 # IntelliJ
 *.iml
