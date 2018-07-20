@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/StretchViewPager.iml" filepath="$PROJECT_DIR$/StretchViewPager.iml" />
-      <module fileurl="file://$PROJECT_DIR$/stretch/stretch.iml" filepath="$PROJECT_DIR$/stretch/stretch.iml" />
-    </modules>
-  </component>
-</project>
