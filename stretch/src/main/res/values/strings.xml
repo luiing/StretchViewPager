@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">TestDemo</string>
+    <string name="gd.pull.normal">滑动查看图文详情</string>
+    <string name="gd.pull.refresh">释放查看图文详情</string>
+</resources>
