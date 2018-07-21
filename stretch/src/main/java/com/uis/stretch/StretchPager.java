@@ -2,7 +2,7 @@
  * Copyright by uis 2018.
  */
 
-package com.uis.test.app;
+package com.uis.stretch;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -13,9 +13,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
-import android.view.animation.DecelerateInterpolator;
-
-import java.math.BigDecimal;
+import android.view.animation.AccelerateInterpolator;
 
 /**
  * 弹性viewpager,支持弹性恢复和侧滑刷新
@@ -29,21 +27,20 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     public static final int STRETCH_BOTH = 0x11;//两边
     public static boolean DEBUG = false;
 
+    private int refreshModel = STRETCH_NONE;//刷新模式,优先级大于弹性模式
+    private int stretchModel = STRETCH_BOTH;//弹性模式
+    private int directionModel = STRETCH_NONE;
+
     private int lastPosition = 0;//记录上一次滑动x坐标
+    private int distanceX = 0;
     private boolean stretchStatus = false;//侧滑状态
     private boolean isAnimRunning = false;//正在执行回弹动画
     private OnStretchListener listener;
-    private int refreshModel = 0x0;//刷新模式,优先级大于弹性模式
-    private int stretchModel = 0x11;//弹性模式
-    private int directionModel = STRETCH_NONE;
-
-    private ValueAnimator anim = ValueAnimator.ofInt(0, 1).setDuration(300);
-
-    private int mScrollX = 0;
-    private int scrollDistance = 0;
-    private int scrollDistancePercent = 0;
-    private int mTouchSlop;
+    private final ValueAnimator anim = ValueAnimator.ofInt(0, 1);
+    //private final int mTouchSlop;
     private int activePointerId;
+    private int firstCurrentId = 0;
+
 
     public StretchPager(@NonNull Context context) {
         this(context,null);
@@ -51,7 +48,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
 
     public StretchPager(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        anim.setInterpolator(new DecelerateInterpolator());
+        anim.setInterpolator(new AccelerateInterpolator());
         //mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
@@ -61,6 +58,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
      */
     public void setRefreshModel(int model){
         this.refreshModel = model;
+        firstCurrentId = (model & STRETCH_LEFT) > 0 ? 1 : 0;
     }
 
     public int getRefreshModel() {
@@ -84,39 +82,27 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(isAnimRunning){//正在执行回弹动画，屏蔽所有滑动事件
-            return false;
-        }
-        Log("action="+ev.getAction()+",x="+ev.getX());
-        switch (ev.getAction() & MotionEvent.ACTION_MASK){
+    public boolean onTouchEvent(MotionEvent ev) {
+        int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
+        switch (actionId){
             case MotionEvent.ACTION_DOWN://0
-                mScrollX = getScrollX();
-                lastPosition = (int)ev.getX();
-                activePointerId = ev.getPointerId(0);
-                Log("start scrollX="+mScrollX);
                 break;
             case MotionEvent.ACTION_MOVE://2
                 final int pointerIndex = ev.findPointerIndex(activePointerId);
-                if(-1 == pointerIndex){
-                    return false;
+                if(null == getAdapter() || -1 == pointerIndex){
+                    return true;
                 }
-                int distanceX = (int)(ev.getX(pointerIndex)-lastPosition);
-                lastPosition = (int)ev.getX(pointerIndex);
-                if(getAdapter() != null){
-                    if(stretchStatus || (stretchStatus = getStretchEnable(distanceX))){
-                        if(distanceX != 0){
-                            scrollByMove(Float.valueOf(0.75f*distanceX).intValue());
-                        }
-                        return false;
-                    }
+                if(stretchStatus){
+                    scrollByMove(distanceX);
+                    return true;
                 }
                 break;
             case MotionEvent.ACTION_UP://1
+                if(stretchStatus || (stretchStatus = getStretchEnable(distanceX)));
             case MotionEvent.ACTION_CANCEL://3
                 if(stretchStatus){
                     scrollEndMove();
-                    return false;
+                    return true;
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN://5
@@ -127,10 +113,30 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
                     return true;
                 }
                 break;
-            default:
-                if(stretchStatus){
-                    return false;
+        }
+        return super.onTouchEvent(ev);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
+        switch (actionId){
+            case MotionEvent.ACTION_DOWN://0
+                lastPosition = (int)ev.getX();
+                activePointerId = ev.getPointerId(0);
+                break;
+            case MotionEvent.ACTION_MOVE://2
+                final int pointerIndex = ev.findPointerIndex(activePointerId);
+                if(null == getAdapter() || -1 == pointerIndex){
+                    break;
                 }
+                final int currentPosition = (int)ev.getX(pointerIndex);
+                distanceX = currentPosition - lastPosition;
+                lastPosition = currentPosition;
+                if(!stretchStatus){
+                    stretchStatus = getStretchEnable(distanceX);
+                }
+                break;
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -154,48 +160,55 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     }
 
     private void scrollByMove(int x){
-        scrollBy(-x, 0);
+        scrollBy(-x*3/4, 0);
         if(null != listener && (refreshModel & STRETCH_BOTH)>0){
-            listener.onScrolled(directionModel,mScrollX - getScrollX());
+            listener.onScrolled(directionModel,getScrollDistance());
         }
     }
 
     private void scrollEndMove() {
-        scrollDistance = mScrollX - getScrollX();
-        if(0 != scrollDistance) {
-            Log("Anim is running...");
-            isAnimRunning = true;
-            anim.addUpdateListener(this);
-            anim.start();
+        final int scrollDistance = getScrollDistance();
+        if(null != listener && !isAnimRunning && (refreshModel & STRETCH_BOTH)>0){
+            if((STRETCH_LEFT == directionModel && scrollDistance >0) || (STRETCH_RIGHT == directionModel && scrollDistance <0)) {
+                listener.onRefresh(directionModel, Math.abs(scrollDistance));
+            }
         }
-        if(null != listener && (refreshModel & STRETCH_BOTH)>0){
-            listener.onRefresh(directionModel,Math.abs(scrollDistance));
+        isAnimRunning = true;
+        if(anim.isRunning()){
+            anim.removeAllUpdateListeners();
+            anim.cancel();
+            anim.setDuration(150);
+        }else{
+            anim.setDuration(300);
         }
+        anim.addUpdateListener(this);
+        anim.start();
     }
+
 
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
         float percent = animation.getAnimatedFraction();
-        int dx = (int) (percent * scrollDistance);
-        scrollBy(dx-scrollDistancePercent, 0);
-        scrollDistancePercent = dx;
-        if(1.0f == percent){
+        int distance = getScrollDistance();
+        int dx = (int) (percent * distance);
+        scrollBy(dx, 0);
+        if(1.0f <= percent){
             anim.removeAllUpdateListeners();
-            scrollDistancePercent = 0;
-            final int expectScrollX = getCurrentItem()*getWidth();
-            if(getScrollX() != expectScrollX){//位置修正
-                Log("repairAnim is running..."+expectScrollX+",currentX="+getScrollX());
-                scrollTo(expectScrollX,0);
-            }
+            if(null != listener)listener.onRelease();
             isAnimRunning = false;
             stretchStatus = false;
-            Log("end scrollX="+getScrollX());
         }
     }
 
+    private int getScrollDistance(){
+        return getExpectScrollX() - getScrollX();
+    }
+
+    private int getExpectScrollX(){
+        return (getCurrentItem()-firstCurrentId)*getWidth();
+    }
+
     private void Log(String msg){
-        if(DEBUG){
-            Log.e(TAG,msg);
-        }
+        if(DEBUG) Log.e(TAG,msg);
     }
 }
