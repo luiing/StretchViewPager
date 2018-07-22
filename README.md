@@ -3,6 +3,11 @@ Support left and right pull viewpager,can refresh and stretch
 
 Simple usefull,Simple extends,Simple source code
 
+<a href="/pic/demo.apk">Demo download</a>
+
+![Refresh1](/pic/demo.gif)
+![Refresh2](/pic/demo1.gif)
+
 # Use
 `implementation 'com.uis:stretch:0.0.1'`
 
@@ -19,12 +24,6 @@ Simple usefull,Simple extends,Simple source code
          pager.setAdapter(adapter);
          pager.setOnStretchListener(adapter);
          pager.addOnPageChangeListener(adapter);
-         pager.setCurrentItem((pager.getRefreshModel()&StretchPager.STRETCH_LEFT)>0 ? 1 : 0);
-# Refresh         
-![Refresh1](/pic/device-2018-07-22-015518.png)
-![Refresh2](/pic/device-2018-07-22-015550.png)
-# Stretch
-![Stretch1](/pic/device-2018-07-22-015938.png)
-![Stretch2](/pic/device-2018-07-22-015910.png)
-![Stretch3](/pic/device-2018-07-22-015923.png)
+         pager.setCurrentItem((pager.getRefreshModel()&StretchPager.STRETCH_LEFT)>0 ? 1 : 0);        
+
 

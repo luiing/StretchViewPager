@@ -13,6 +13,7 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.stretch.demo.ListActivity;
 import com.example.stretch.demo.R;
@@ -65,7 +66,8 @@ public class FragRefreshRight extends Fragment implements OnStretchListener {
     public void onRefresh(int direction, int distance) {
         if(StretchPager.STRETCH_RIGHT == direction) {
             if(distance >= Distance){
-                Intent intent = new Intent(getContext(),ListActivity.class);
+                Toast.makeText(getContext(),"refresh success",Toast.LENGTH_SHORT).show();
+                //Intent intent = new Intent(getContext(),ListActivity.class);
                 //startActivity(intent);
             }
         }

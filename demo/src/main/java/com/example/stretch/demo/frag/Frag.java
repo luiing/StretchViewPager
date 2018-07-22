@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.stretch.demo.R;
@@ -18,23 +18,22 @@ import com.example.stretch.demo.R;
  */
 public class Frag extends Fragment implements View.OnClickListener{
 
+    static int[] urls = new int[]{R.mipmap.p1001,R.mipmap.p1002,R.mipmap.p1003,R.mipmap.p1004};
     RecyclerView recyclerView;
-    RecyclerView recyclerViewVer;
-    TextView tvTxt;
+    ImageView ivIcon;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.frg_frag,container,false);
+        View v = inflater.inflate(R.layout.frg_icon,container,false);
         recyclerView = v.findViewById(R.id.recycler_view);
-        recyclerViewVer = v.findViewById(R.id.recyclerview);
-        tvTxt = v.findViewById(R.id.tv_txt);
+        ivIcon = v.findViewById(R.id.iv_icon);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext(),LinearLayoutManager.HORIZONTAL,false));
         recyclerView.setAdapter(new RecyclerAdapter());
-        recyclerViewVer.setLayoutManager(new LinearLayoutManager(container.getContext()));
-        recyclerViewVer.setAdapter(new RecyclerAdapter());
-        tvTxt.setText(getArguments().getString("id"," none "));
-        tvTxt.setOnClickListener(this);
+        int id = getArguments().getInt("id",0);
+        ivIcon.setImageResource(urls[id]);
         return v;
     }
 

@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pager = (StretchPager)findViewById(R.id.pager);
-        pager.setRefreshModel(StretchPager.STRETCH_NONE);
+        pager.setRefreshModel(StretchPager.STRETCH_RIGHT);
         pager.setStretchModel(StretchPager.STRETCH_BOTH);
         FragAdapter adapter = new FragAdapter(getSupportFragmentManager(),pager.getRefreshModel());
         pager.setAdapter(adapter);

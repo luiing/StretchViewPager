@@ -29,7 +29,7 @@ public class FragAdapter extends FragmentPagerAdapter implements OnStretchListen
         for(int i=0;i<4;i++){
             Fragment f = new Frag();
             Bundle b = new Bundle();
-            b.putString("id","postion = " + (i+1));
+            b.putInt("id",i);
             f.setArguments(b);
             data.add(f);
         }
