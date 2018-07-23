@@ -3,10 +3,8 @@ Support left and right pull viewpager,can refresh and stretch
 
 Simple usefull,Simple extends,Simple source code
 
-<a href="/pic/demo.apk">Demo download</a>
-
-![Refresh1](/pic/demo.gif)
-![Refresh2](/pic/demo1.gif)
+![Refresh1](/pic/demo10.gif)
+![Refresh2](/pic/demo20.gif)
 
 # Use
 `implementation 'com.uis:stretch:0.0.1'`
