@@ -39,7 +39,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     private final ValueAnimator anim = ValueAnimator.ofInt(0, 1);
     //private final int mTouchSlop;
     private int activePointerId;
-    private int firstCurrentId = 0;
+    private int firstCurrentId = -1;
 
 
     public StretchPager(@NonNull Context context) {
@@ -58,7 +58,6 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
      */
     public void setRefreshModel(int model){
         this.refreshModel = model;
-        firstCurrentId = (model & STRETCH_LEFT) > 0 ? 1 : 0;
     }
 
     public int getRefreshModel() {
@@ -122,6 +121,9 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
         switch (actionId){
             case MotionEvent.ACTION_DOWN://0
+                if(-1 == firstCurrentId){
+                    firstCurrentId = getCurrentItem();
+                }
                 lastPosition = (int)ev.getX();
                 activePointerId = ev.getPointerId(0);
                 break;
