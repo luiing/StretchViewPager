@@ -1,4 +1,4 @@
-package com.uis.test.app;
+package com.example.stretch.demo;
 
 import android.content.Context;
 import android.util.Log;

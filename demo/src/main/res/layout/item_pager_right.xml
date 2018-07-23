@@ -6,7 +6,6 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f8f8f8"
     >
     <ImageView android:id="@+id/iv_pull"
         android:layout_width="18dp"
@@ -16,12 +15,12 @@
         android:layout_marginLeft="10dp"
         />
     <TextView android:id="@+id/tv_tips"
-        android:layout_width="18dp"
+        android:layout_width="16dp"
         android:layout_height="match_parent"
         android:textColor="#333333"
         android:textSize="14sp"
         android:text="@string/gd.pull.normal"
         android:gravity="center_vertical"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="10dp"
         />
 </LinearLayout>

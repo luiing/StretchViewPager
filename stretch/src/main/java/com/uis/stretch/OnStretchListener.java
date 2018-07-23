@@ -1,4 +1,4 @@
-package com.uis.test.app;
+package com.uis.stretch;
 
 /**
  * @author uis on 2018/7/19.
@@ -15,4 +15,9 @@ public interface OnStretchListener {
      * @param distance 释放时偏移量，为正数
      */
     void onRefresh(int direction,int distance);
+
+    /**
+     * 回弹结束
+     */
+    void onRelease();
 }
