@@ -195,7 +195,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         //Log("current end x="+getScrollX()+",percent="+percent+",dx="+dx);
         if(1.0f <= percent){
             anim.removeAllUpdateListeners();
-            if(null != listener)listener.onRelease();
+            if(null != listener)listener.onRelease(directionModel);
             isAnimRunning = false;
             stretchStatus = false;
             Log("current end x="+getScrollX());

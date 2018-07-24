@@ -7,7 +7,7 @@ Simple usefull,Simple extends,Simple source code
 ![Refresh2](/pic/demo20.gif)
 
 # Use
-`implementation 'com.uis:stretch:0.0.3'`
+`implementation 'com.uis:stretch:0.1.0'`
 
 # Notice
 1. First found out currentItem,then compare move distance and direction.
@@ -17,6 +17,7 @@ Simple usefull,Simple extends,Simple source code
 # Version
 1. 0.0.2-fixed deviation
 2. 0.0.3-fixed PagerAdapter.POSITION_NONE model
+3. 0.1.0-add onRelease direction,add SimpleStretchListener class
 
 # Show
          pager = (StretchPager)findViewById(R.id.pager);

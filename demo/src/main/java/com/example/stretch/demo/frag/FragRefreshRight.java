@@ -74,7 +74,7 @@ public class FragRefreshRight extends Fragment implements OnStretchListener {
     }
 
     @Override
-    public void onRelease() {
+    public void onRelease(int direction) {
         lastStatus = 0;
         ivPull.clearAnimation();
         ivTips.setText(getResources().getString(R.string.gd_pull_normal));
