@@ -82,9 +82,9 @@ public class FragAdapter extends FragmentPagerAdapter implements OnStretchListen
     }
 
     @Override
-    public void onRelease() {
+    public void onRelease(int direction) {
         if(getItem(current) instanceof OnStretchListener){
-            ((OnStretchListener) getItem(current)).onRelease();
+            ((OnStretchListener) getItem(current)).onRelease(direction);
         }
     }
 }
