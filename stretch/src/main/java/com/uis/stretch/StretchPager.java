@@ -22,25 +22,31 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpdateListener{
     static final String TAG = "StretchPager";
     public static final int STRETCH_NONE = 0x00;
-    public static final int STRETCH_LEFT = 0x01;//left stretch
-    public static final int STRETCH_RIGHT = 0x10;//right stretch
-    public static final int STRETCH_BOTH = 0x11;//both stretch
+    /** left stretch */
+    public static final int STRETCH_LEFT = 0x01;
+    /** right stretch */
+    public static final int STRETCH_RIGHT = 0x10;
+    /** both stretch */
+    public static final int STRETCH_BOTH = 0x11;
     public static boolean DEBUG = false;
-
-    private int refreshModel = STRETCH_NONE;//refresh priority GT stretch
+    /** refresh priority GT stretch */
+    private int refreshModel = STRETCH_NONE;
     private int stretchModel = STRETCH_BOTH;
     private int directionModel = STRETCH_NONE;
     private int animDuration = 300;
-
-    private int lastPosition = 0;//last x position
+    /** last x position */
+    private int lastPosition = 0;
     private int distanceX = 0;
     private boolean stretchStatus = false;
-    private boolean isAnimRunning = false;//is recover anim running
+    /** is recover anim running */
+    private boolean isAnimRunning = false;
     private OnStretchListener listener;
     private final ValueAnimator anim = ValueAnimator.ofInt(0, 1);
     //private final int mTouchSlop;
     private int activePointerId;
-    private int firstScrollX = 0;//first touch down,current scrollx vaule
+    /** first touch down,current scrollx vaule */
+    private int firstScrollX = 0;
+    private int lastTotalDistance = 0;
 
     public StretchPager(@NonNull Context context) {
         this(context,null);
@@ -176,21 +182,22 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
 
     private void scrollEndMove() {
         isAnimRunning = true;
-        anim.addUpdateListener(this);
-        anim.setDuration(animDuration);
-        lastTotalDistance = 0;
-        anim.start();
         final int scrollDistance = getScrollDistance();
-        if(null != listener && !isAnimRunning ){
+        if(null != listener){
             if((STRETCH_LEFT == directionModel && scrollDistance >0) || (STRETCH_RIGHT == directionModel && scrollDistance <0)) {
                 listener.onRefresh(directionModel, Math.abs(scrollDistance));
             }
         }
+        refreshDoneAnim();
         //Log("start anim  running....");
     }
 
+    private void refreshDoneAnim(){
+        anim.addUpdateListener(this);
+        anim.setDuration(animDuration);
+        anim.start();
+    }
 
-    int lastTotalDistance = 0;
 
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
