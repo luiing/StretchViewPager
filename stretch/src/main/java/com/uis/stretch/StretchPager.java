@@ -6,13 +6,16 @@ package com.uis.stretch;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 /**
@@ -47,6 +50,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     /** first touch down,current scrollx vaule */
     private int firstScrollX = 0;
     private int lastTotalDistance = 0;
+    private View leftView,rightView;
 
     public StretchPager(@NonNull Context context) {
         this(context,null);
@@ -58,16 +62,17 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         //mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
-    /**
-     * set Refresh model，default is: closed
-     * @param model one of {@link #STRETCH_BOTH},{@link #STRETCH_LEFT},{@link #STRETCH_RIGHT},{@link #STRETCH_NONE}
-     */
-    public void setRefreshModel(int model){
-        this.refreshModel = model;
-    }
-
-    public int getRefreshModel() {
-        return refreshModel;
+    public void setRefreshView(View leftView,View rightView){
+        this.leftView = leftView;
+        this.rightView = rightView;
+        if(leftView != null){
+            refreshModel |= STRETCH_LEFT;
+        }
+        if(rightView != null){
+            refreshModel |= STRETCH_RIGHT;
+        }
+        addView(leftView);
+        addView(rightView);
     }
 
     /**
@@ -162,21 +167,41 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         boolean refreshRight = (STRETCH_RIGHT & refreshModel)>0;
         boolean stretchLeft = (STRETCH_LEFT & stretchModel) > 0;
         boolean stretchRight = (STRETCH_RIGHT & stretchModel) > 0;
-        if( (stretchLeft || refreshLeft) && (refreshLeft ? 1 : 0) == getCurrentItem() && distanceX>0 ){
+        if( (stretchLeft || refreshLeft) && 0 == getCurrentItem() && distanceX>0 ){
             directionModel = STRETCH_LEFT;//left edge and distanceX GT 0
-        }else if((stretchRight || refreshRight) && getAdapter().getCount() == getCurrentItem()+1+(refreshRight ? 1 : 0) && distanceX<0){
+        }else if((stretchRight || refreshRight) && getAdapter().getCount() == getCurrentItem()+1 && distanceX<0){
             directionModel = STRETCH_RIGHT;//right edge and distanceX LT 0
         }else{
             directionModel = STRETCH_NONE;
             enable = false;
         }
+        removeView(leftView);
+        removeView(rightView);
         return enable;
     }
 
     private void scrollByMove(int x){
+        addLeftRightEdge();
         scrollBy(-x*4/5, 0);
         if(null != listener){
             listener.onScrolled(directionModel,getScrollDistance());
+        }
+    }
+
+    private void addLeftRightEdge(){
+        int width = getMeasuredWidth();
+        int scrollX = getExpectScrollX();
+        if(directionModel == STRETCH_LEFT && leftView != null && leftView.getParent()==null){
+            int left = scrollX-width;
+            int right = scrollX;
+            addView(leftView);
+            leftView.layout(left,0,right,getMeasuredHeight());
+        }else if(directionModel == STRETCH_RIGHT && rightView != null && rightView.getParent()==null){
+            int left = scrollX+width;
+            int right = left + width;
+            addView(rightView);
+            rightView.layout(left,0,right,getMeasuredHeight());
+
         }
     }
 
@@ -214,16 +239,9 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
             if(null != listener)listener.onRelease(directionModel);
             isAnimRunning = false;
             stretchStatus = false;
+            removeView(leftView);
+            removeView(rightView);
             Log("current end x="+getScrollX());
-        }
-    }
-
-    @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        if(0 == l && Math.abs(oldl) > getWidth()){//fixed PagerAdapter.POSITION_NONE  adapter data changed
-            firstScrollX = 0;
-            //Log("current="+l+",old="+oldl+",item="+getCurrentItem());
         }
     }
 

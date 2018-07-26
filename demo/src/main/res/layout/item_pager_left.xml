@@ -2,28 +2,26 @@
 <!--
   ~ Copyright by uis 2018.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <ImageView android:id="@+id/iv_pull"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_gravity="center_vertical"
-        android:src="@mipmap/gd_pull_icon"
-        android:layout_marginRight="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        />
     <TextView android:id="@+id/tv_tips"
-        android:layout_width="18dp"
+        android:layout_width="16dp"
         android:layout_height="match_parent"
         android:textColor="#333333"
         android:textSize="14sp"
         android:text="@string/gd.pull.normal"
-        android:gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        android:layout_toLeftOf="@id/iv_pull"
+        android:gravity="right|center_vertical"
+        android:layout_gravity="right"
+        android:layout_marginRight="40dp"
         />
-</RelativeLayout>
+    <ImageView android:id="@+id/iv_pull"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@mipmap/gd_pull_icon"
+        android:rotation="180"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="10dp"
+        />
+</FrameLayout>
