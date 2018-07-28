@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,13 +22,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private StretchPager pager;
     FragAdapter adapter;
     View leftView,rightView;
+    LinearLayout ll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pager = (StretchPager)findViewById(R.id.pager);
-
 
         animLeftStart.setFillAfter(true);
         animLeftStart.setDuration(300);
@@ -38,12 +39,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         animRightEnd.setDuration(300);
         leftView = LayoutInflater.from(this).inflate(R.layout.item_pager_left,null);
         rightView = LayoutInflater.from(this).inflate(R.layout.item_pager_right,null);
+
         pager.setRefreshView(leftView,rightView);
-        pager.setStretchModel(StretchPager.STRETCH_BOTH);
         adapter = new FragAdapter(4,getSupportFragmentManager());
         pager.setAdapter(adapter);
         pager.setOnStretchListener(this);
-        pager.setCurrentItem(0);
+        pager.setCurrentItem(3);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(0 == status && 1 == lastStatus){
                     ivPull.startAnimation(animLeftEnd);
                 }else if(1 == status){
-                    ivPull.startAnimation(animRightStart);
+                    ivPull.startAnimation(animLeftStart);
                 }
             }
             lastStatus = status;

@@ -2,7 +2,7 @@
 <!--
   ~ Copyright by uis 2018.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
@@ -12,16 +12,17 @@
         android:textColor="#333333"
         android:textSize="14sp"
         android:text="@string/gd.pull.normal"
-        android:gravity="right|center_vertical"
-        android:layout_gravity="right"
+        android:gravity="center"
         android:layout_marginRight="40dp"
+        android:layout_alignParentRight="true"
         />
     <ImageView android:id="@+id/iv_pull"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:src="@mipmap/gd_pull_icon"
         android:rotation="180"
-        android:layout_gravity="right|center_vertical"
+        android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
         />
-</FrameLayout>
+</RelativeLayout>
