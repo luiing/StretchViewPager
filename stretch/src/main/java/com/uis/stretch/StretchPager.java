@@ -6,7 +6,6 @@ package com.uis.stretch;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -15,8 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
 
 /**
  * stretch viewpager,support stretch recover,support edge refresh
@@ -36,7 +35,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     private int refreshModel = STRETCH_NONE;
     private int stretchModel = STRETCH_BOTH;
     private int directionModel = STRETCH_NONE;
-    private int animDuration = 300;
+    private float mRate = 0.55f;//from 0-1.0
     /** last x position */
     private int lastPosition = 0;
     private int distanceX = 0;
@@ -59,6 +58,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     public StretchPager(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         anim.setInterpolator(new AccelerateDecelerateInterpolator());//set recover anim interpolator,this is more better
+        anim.setDuration(300);
         //mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
@@ -71,8 +71,10 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         if(rightView != null){
             refreshModel |= STRETCH_RIGHT;
         }
-        addView(leftView);
-        addView(rightView);
+    }
+
+    public int getRefreshModel() {
+        return refreshModel;
     }
 
     /**
@@ -91,8 +93,77 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         listener = l;
     }
 
+    public void setAnimInterpolator(Interpolator interpolator){
+        this.anim.setInterpolator(interpolator);
+    }
+
     public void setAnimDuration(int duration){
-        this.animDuration = duration;
+        this.anim.setDuration(duration);
+    }
+
+    public void setRate(float rate) {
+        this.mRate = rate;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final int count = getChildCount();
+        View child = getChildAt(count-1);
+        if(child != null && (child == leftView || child == rightView)){
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            lp.isDecor = true;//装饰view开启，否则布局内容显示错位
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        final int count = getChildCount();//重新放置位置
+        View child = getChildAt(count-1);
+        if(child != null) {
+            int width = getMeasuredWidth();
+            int scrollX = getExpectScrollX();
+            if (child == leftView) {
+                int left = scrollX - width;
+                int right = scrollX;
+                leftView.layout(left, 0, right, getMeasuredHeight());
+            } else if (child == rightView) {
+                int left = scrollX + width;
+                int right = left + width;
+                rightView.layout(left, 0, right, getMeasuredHeight());
+            }
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        //Log("actionId="+ev.getAction()+".....");
+        int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
+        switch (actionId){
+            case MotionEvent.ACTION_DOWN://0
+                Log("current start x="+getScrollX());
+                if(!isAnimRunning) {
+                    firstScrollX = getScrollX();
+                }
+                lastPosition = (int)ev.getX();
+                activePointerId = ev.getPointerId(0);
+                break;
+            case MotionEvent.ACTION_MOVE://2
+                final int pointerIndex = ev.findPointerIndex(activePointerId);
+                if(null == getAdapter() || -1 == pointerIndex){
+                    break;
+                }
+                final int currentPosition = (int)ev.getX(pointerIndex);
+                distanceX = currentPosition - lastPosition;
+                lastPosition = currentPosition;
+                if(!stretchStatus){
+                    stretchStatus = getStretchEnable(distanceX);
+                }
+                break;
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -128,37 +199,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
                 }
                 break;
         }
-        //Log("actionId="+ev.getAction()+",stretchStatus="+stretchStatus+",distanceX="+distanceX);
         return super.onTouchEvent(ev);
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        //Log("actionId="+ev.getAction()+".....");
-        int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
-        switch (actionId){
-            case MotionEvent.ACTION_DOWN://0
-                Log("current start x="+getScrollX());
-                if(!isAnimRunning) {
-                    firstScrollX = getScrollX();
-                }
-                lastPosition = (int)ev.getX();
-                activePointerId = ev.getPointerId(0);
-                break;
-            case MotionEvent.ACTION_MOVE://2
-                final int pointerIndex = ev.findPointerIndex(activePointerId);
-                if(null == getAdapter() || -1 == pointerIndex){
-                    break;
-                }
-                final int currentPosition = (int)ev.getX(pointerIndex);
-                distanceX = currentPosition - lastPosition;
-                lastPosition = currentPosition;
-                if(!stretchStatus){
-                    stretchStatus = getStretchEnable(distanceX);
-                }
-                break;
-        }
-        return super.dispatchTouchEvent(ev);
     }
 
     private boolean getStretchEnable(int distanceX){
@@ -175,33 +216,24 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
             directionModel = STRETCH_NONE;
             enable = false;
         }
-        removeView(leftView);
-        removeView(rightView);
         return enable;
     }
 
     private void scrollByMove(int x){
         addLeftRightEdge();
-        scrollBy(-x*4/5, 0);
+        double rate = Math.exp(-mRate*Math.abs(x)/100);
+        x = -(int)(rate*x);
+        scrollBy(x, 0);
         if(null != listener){
             listener.onScrolled(directionModel,getScrollDistance());
         }
     }
 
     private void addLeftRightEdge(){
-        int width = getMeasuredWidth();
-        int scrollX = getExpectScrollX();
         if(directionModel == STRETCH_LEFT && leftView != null && leftView.getParent()==null){
-            int left = scrollX-width;
-            int right = scrollX;
             addView(leftView);
-            leftView.layout(left,0,right,getMeasuredHeight());
         }else if(directionModel == STRETCH_RIGHT && rightView != null && rightView.getParent()==null){
-            int left = scrollX+width;
-            int right = left + width;
             addView(rightView);
-            rightView.layout(left,0,right,getMeasuredHeight());
-
         }
     }
 
@@ -209,26 +241,20 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
         isAnimRunning = true;
         final int scrollDistance = getScrollDistance();
         if(null != listener){
-            if((STRETCH_LEFT == directionModel && scrollDistance >0) || (STRETCH_RIGHT == directionModel && scrollDistance <0)) {
-                listener.onRefresh(directionModel, Math.abs(scrollDistance));
-            }
+            listener.onRefresh(directionModel, Math.abs(scrollDistance));
         }
         refreshDoneAnim();
-        //Log("start anim  running....");
     }
 
     private void refreshDoneAnim(){
         anim.addUpdateListener(this);
-        anim.setDuration(animDuration);
         anim.start();
     }
-
 
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
         float percent = animation.getAnimatedFraction();
         int distance = getScrollDistance();
-
         int firstTotalDistance = distance + lastTotalDistance;
         int dx = (int) ((percent>1.0f ? 1.0:percent) * firstTotalDistance) - lastTotalDistance;
         lastTotalDistance += dx;

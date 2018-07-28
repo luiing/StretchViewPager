@@ -13,7 +13,7 @@ public interface OnStretchListener {
     void onScrolled(int direction,int distance);
 
     /**
-     * 正在刷新 refreshing
+     * 释放时状态，正在刷新 refreshing
      * @param direction model one of {@link StretchPager#STRETCH_RIGHT},{@link StretchPager#STRETCH_RIGHT};
      *                  拽拉方向, STRETCH_LEFT 左边拽拉，STRETCH_RIGHT 右边拽拉
      * @param distance 释放时偏移量，为正数abs
