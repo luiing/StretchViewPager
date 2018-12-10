@@ -13,13 +13,14 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
 /**
  * stretch viewpager,support stretch recover,support edge refresh
  * @author uis 2018/7/18
+ * @since 0.3.0 2018/10/20 fixed ViewPager.OnPageChangeListener#onPageScrolled(int, float, int) positionOffsetPixels
+ * use computeScroll
  */
 public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpdateListener{
     static final String TAG = "StretchPager";
@@ -35,7 +36,6 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     private int refreshModel = STRETCH_NONE;
     private int stretchModel = STRETCH_BOTH;
     private int directionModel = STRETCH_NONE;
-    private float mRate = 0.55f;//from 0-1.0
     /** last x position */
     private int lastPosition = 0;
     private int distanceX = 0;
@@ -99,10 +99,6 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
 
     public void setAnimDuration(int duration){
         this.anim.setDuration(duration);
-    }
-
-    public void setRate(float rate) {
-        this.mRate = rate;
     }
 
     @Override
@@ -221,8 +217,8 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
 
     private void scrollByMove(int x){
         addLeftRightEdge();
-        double rate = Math.exp(-mRate*Math.abs(x)/100);
-        x = -(int)(rate*x);
+        double rate = 1.0 - Math.abs(0.6*(getScrollX()-firstScrollX))/getWidth();
+        x = (int)(-x * rate);
         scrollBy(x, 0);
         if(null != listener){
             listener.onScrolled(directionModel,getScrollDistance());

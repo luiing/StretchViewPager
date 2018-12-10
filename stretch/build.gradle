@@ -16,80 +16,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.android.support:support-v4:$supportVer"
+    compileOnly "com.android.support:support-v4:$supportVer"
 }
 
-Properties propLocal = new Properties()
-propLocal.load(project.rootProject.file('local.properties').newDataInputStream())
-
-version=propLocal.getProperty("bintray.version")
-group=propLocal.getProperty("bintray.group")
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'jar'
-                name propLocal.getProperty("bintray.module")
-                description propLocal.getProperty("bintray.module")
-                url propLocal.getProperty('bintray.module.url')
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id  propLocal.getProperty('bintray.id')
-                        name propLocal.getProperty('bintray.name')
-                        email ""
-                    }
-                }
-                scm {
-                    connection propLocal.getProperty('bintray.module.git')
-                    developerConnection propLocal.getProperty('bintray.module.git')
-                    url propLocal.getProperty('bintray.module.url')
-                }
-            }
-        }
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    options.encoding = "UTF-8"
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-bintray {
-    user = propLocal.getProperty('bintray.name')
-    key = propLocal.getProperty('bintray.apikey')
-    configurations = ['archives']
-    pkg {
-        userOrg = propLocal.getProperty("bintray.id")
-        repo = "maven"
-        name = propLocal.getProperty("bintray.module")
-        websiteUrl = propLocal.getProperty('bintray.module.url')
-        vcsUrl = propLocal.getProperty('bintray.module.git')
-        licenses = ["Apache-2.0"]
-        publish = true
-    }
-}
+//apply from: '../../bintray.gradle'
 
 
