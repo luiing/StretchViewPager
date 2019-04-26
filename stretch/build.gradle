@@ -11,6 +11,19 @@ android {
         versionCode 1
         versionName "1.0"
         consumerProguardFiles 'proguard-rules.pro'
+        sourceSets {
+            main{
+                java {
+                    exclude '**/test/*'
+                }
+                resources {
+                    exclude '**/test/*'
+                }
+            }
+        }
+    }
+    sourceSets {
+
     }
 }
 
@@ -19,6 +32,6 @@ dependencies {
     compileOnly "com.android.support:support-v4:$supportVer"
 }
 
-//apply from: '../../bintray.gradle'
+apply from: '../../bintray.gradle'
 
 
