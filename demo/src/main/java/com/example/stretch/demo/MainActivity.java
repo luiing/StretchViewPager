@@ -2,6 +2,7 @@ package com.example.stretch.demo;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,8 +29,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        pager = (StretchPager)findViewById(R.id.pager);
+        pager = findViewById(R.id.pager);
 
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
         animLeftStart.setFillAfter(true);
         animLeftStart.setDuration(300);
         animLeftEnd.setDuration(300);
@@ -44,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new FragAdapter(4,getSupportFragmentManager());
         pager.setAdapter(adapter);
         pager.setOnStretchListener(this);
-        pager.setCurrentItem(3);
+
     }
 
     @Override

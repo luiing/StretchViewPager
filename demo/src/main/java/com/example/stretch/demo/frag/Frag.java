@@ -34,6 +34,14 @@ public class Frag extends Fragment implements View.OnClickListener{
         recyclerView.setAdapter(new RecyclerAdapter());
         int id = getArguments().getInt("id",0);
         ivIcon.setImageResource(urls[id]);
+        ivIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getActivity() instanceof View.OnClickListener){
+                    ((View.OnClickListener) getActivity()).onClick(v);
+                }
+            }
+        });
         return v;
     }
 

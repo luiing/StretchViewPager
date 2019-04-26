@@ -38,15 +38,4 @@ public class FragAdapter extends FragmentPagerAdapter{
     public int getCount() {
         return data.size();
     }
-
-    @Override
-    public int getItemPosition(Object object) {
-        return POSITION_NONE;
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        StretchPager.Log("positon="+position);
-        return super.instantiateItem(container, position);
-    }
 }
