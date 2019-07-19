@@ -8,45 +8,30 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.stretch.demo.R;
 
 /**
  * @author uis 2018/7/21
  */
-public class Frag extends Fragment implements View.OnClickListener{
+public class Frag extends Fragment{
 
-    static int[] urls = new int[]{R.mipmap.p1001,R.mipmap.p1002,R.mipmap.p1003,R.mipmap.p1004};
-    RecyclerView recyclerView;
-    ImageView ivIcon;
+
+    RecyclerView recycler_view,recyclerView;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frg_icon,container,false);
-        recyclerView = v.findViewById(R.id.recycler_view);
-        ivIcon = v.findViewById(R.id.iv_icon);
+        recycler_view = v.findViewById(R.id.recycler_view);
+        recyclerView = v.findViewById(R.id.recyclerView);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext(),LinearLayoutManager.HORIZONTAL,false));
-        recyclerView.setAdapter(new RecyclerAdapter());
         int id = getArguments().getInt("id",0);
-        ivIcon.setImageResource(urls[id]);
-        ivIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(getActivity() instanceof View.OnClickListener){
-                    ((View.OnClickListener) getActivity()).onClick(v);
-                }
-            }
-        });
+        recycler_view.setLayoutManager(new LinearLayoutManager(container.getContext(),LinearLayoutManager.HORIZONTAL,false));
+        recycler_view.setAdapter(new RecyclerAdapter(id,true));
+        recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext(),LinearLayoutManager.VERTICAL,false));
+        recyclerView.setAdapter(new RecyclerAdapter(id,false));
         return v;
-    }
-
-    @Override
-    public void onClick(View v) {
-        Toast.makeText(v.getContext(),"click...",Toast.LENGTH_SHORT).show();
     }
 }

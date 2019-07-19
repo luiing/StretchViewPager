@@ -1,14 +1,14 @@
 ### StretchViewPager
 Support left and right pull viewpager,can refresh and stretch
 
-Simple usefull,Simple extends,Simple source code
+Simple usefull,Simple extends,Simple source code,Support AndroidX
 
 ![Refresh1](/pic/demo10.gif)
 ![Refresh2](/pic/demo20.gif)
 
 ### Use
 
-    implementation 'com.uis:stretch:0.2.2'`
+    implementation 'com.uis:stretch:0.2.3'
     implementation "com.android.support:support-v4:$supportVer"
 
     leftView = LayoutInflater.from(this).inflate(R.layout.item_pager_left,null);
@@ -19,9 +19,12 @@ Simple usefull,Simple extends,Simple source code
     pager.setOnStretchListener(this);
     
 ### Version(call setRefreshView set refresh header)
-1. 0.2.0 通过addView增加边界内容
-2. 0.2.1 fixed swip next page didn't work
-3. 0.2.2 fixed last page disappear content
+Version|Remarks|Time
+----|----|----
+0.2.0 |通过addView增加边界内容|2018/7
+0.2.1 |fixed swip next page didn't work|2019/4
+0.2.2 |fixed last page disappear content|2019/7
+0.2.3 |fixed swip next page didn't work after vertical swip |2019/7
 
 ### LICENSE
 Copyright 2018, uis
