@@ -38,14 +38,17 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     private int lastPosition = 0;
     private int distanceX = 0;
     private int expectDistance;
-    private boolean stretchStatus;
+    private boolean stretchStatus = false;
     private OnStretchListener listener;
     private final ValueAnimator anim = ValueAnimator.ofInt(0, 1);
     private int activePointerId;
     /** first touch down,current scrollx vaule */
     private int firstScrollX = 0;
     private int lastTotalDistance = 0;
+    /** 回弹动画正在播放*/
     private boolean isAnimalRunning = false;
+    /** 触摸在边界位置合法*/
+    private boolean validTouch = false;
     private View leftView,rightView;
 
     public StretchPager(@NonNull Context context) {
@@ -114,14 +117,17 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
+        Log("FF actionId="+actionId);
         switch (actionId){
             case MotionEvent.ACTION_DOWN://0
-                firstScrollX = getScrollX();
-                int width = getWidth();
-                int round = (int) Math.round(1.0 * firstScrollX / width);//fixed scrollx distance
-                expectDistance = round * width;
+                validTouch = !isAnimalRunning;
+                if(validTouch) {
+                    firstScrollX = getScrollX();
+                    int width = getWidth();
+                    int round = (int) Math.round(1.0 * firstScrollX / width);//fixed scrollx distance
+                    expectDistance = round * width;
+                }
                 lastPosition = (int) ev.getX();
-                stretchStatus = false;
                 activePointerId = ev.getPointerId(0);
                 break;
             case MotionEvent.ACTION_MOVE://2
@@ -133,7 +139,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
                 distanceX = currentPosition - lastPosition;
                 lastPosition = currentPosition;
                 if(!stretchStatus) {
-                    stretchStatus = getStretchEnable(distanceX);
+                    stretchStatus = validTouch && getStretchEnable(distanceX);
                 }
                 break;
         }
@@ -143,30 +149,31 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         int actionId = ev.getAction() & MotionEvent.ACTION_MASK;
-        switch (actionId){
+        switch (actionId) {
             case MotionEvent.ACTION_DOWN://0
                 break;
             case MotionEvent.ACTION_MOVE://2
                 final int pointerIndex = ev.findPointerIndex(activePointerId);
-                if(null == getAdapter() || -1 == pointerIndex){
+                if (null == getAdapter() || -1 == pointerIndex) {
                     return true;
                 }
-                if(stretchStatus){
+                if (stretchStatus) {
                     scrollByMove(distanceX);
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_UP://1
             case MotionEvent.ACTION_CANCEL://3
-                if(stretchStatus){
+                if (validTouch && stretchStatus) {
+                    validTouch = false;
                     scrollEndMove();
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN://5
-                if(stretchStatus){
+                if (stretchStatus) {
                     final int index = ev.getActionIndex();
-                    lastPosition = (int)ev.getX(index);//multi-touch
+                    lastPosition = (int) ev.getX(index);//multi-touch
                     activePointerId = ev.getPointerId(index);
                     return true;
                 }
@@ -189,7 +196,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
             directionModel = STRETCH_NONE;
             enable = false;
         }
-        return enable && !isAnimalRunning;
+        return enable;
     }
 
     private void scrollByMove(int x){
@@ -219,7 +226,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
 
     private void scrollEndMove() {
         final int scrollDistance = getScrollDistance();
-        if(null != listener){
+        if (null != listener) {
             listener.onRefresh(directionModel, Math.abs(scrollDistance));
         }
         refreshDoneAnim();
@@ -246,6 +253,7 @@ public class StretchPager extends ViewPager implements ValueAnimator.AnimatorUpd
             removeView(rightView);
             lastTotalDistance = 0;
             isAnimalRunning = false;
+            stretchStatus = false;
         }
     }
 
