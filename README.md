@@ -2,6 +2,7 @@
 Support left and right pull viewpager,can refresh and stretch
 
 Simple usefull,Simple extends,Simple source code,Support AndroidX
+In this project use ViewPager.LayoutParams.isDecor to support boundary
 
 ![Refresh1](/pic/demo10.gif)
 ![Refresh2](/pic/demo20.gif)
@@ -21,7 +22,7 @@ Simple usefull,Simple extends,Simple source code,Support AndroidX
 ### Version(call setRefreshView set refresh header)
 Version|Remarks|Time
 ----|----|----
-0.2.0 |通过addView增加边界内容|2018/7
+0.2.0 |through addView support boundary|2018/7
 0.2.1 |fixed swip next page didn't work|2019/4
 0.2.2 |fixed last page disappear content|2019/7
 0.2.3 |fixed swip next page didn't work after vertical swip |2019/7
