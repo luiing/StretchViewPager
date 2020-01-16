@@ -1,6 +1,5 @@
 package com.example.stretch.demo;
 
-import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +16,11 @@ import com.example.stretch.demo.frag.FragAdapter;
 import com.uis.stretch.OnStretchListener;
 import com.uis.stretch.StretchPager;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,OnStretchListener{
+public class MainActivity extends AppCompatActivity implements OnStretchListener{
 
     private StretchPager pager;
     FragAdapter adapter;
     View leftView,rightView;
-    LinearLayout ll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
-    public void onClick(View view) {
-
-    }
     static final int Distance = (int)(Resources.getSystem().getDisplayMetrics().density*80+0.5);
     RotateAnimation animLeftStart = new RotateAnimation(0f,-180f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
     RotateAnimation animLeftEnd = new RotateAnimation(-180f,0f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
@@ -111,8 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRefresh(int direction, int distance) {
         if(StretchPager.STRETCH_LEFT == direction) {
             if(distance >= Distance){
-                Intent intent = new Intent(this,ListActivity.class);
-                //startActivity(intent);
+
             }
         }else if(StretchPager.STRETCH_RIGHT == direction) {
             if(distance >= Distance){
